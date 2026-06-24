@@ -273,7 +273,7 @@
           <input type="text" class="county-input" id="countyInput" placeholder="State name, e.g. Alabama or Florida" onkeydown="if(event.key==='Enter') searchAgents()" />
           <div class="input-help" id="countyFeedback">Enter a real U.S. state like Alabama or Florida.</div>
         </div>
-        <input type="number" class="limit-input" id="limitInput" value="20" min="5" max="100" title="Max results" />
+        <input type="number" class="limit-input" id="limitInput" value="500" min="50" max="500" title="Max results">
         <button class="btn btn-primary" id="searchBtn" onclick="searchAgents()">Search</button>
       </div>
     </div>
@@ -540,11 +540,16 @@ function buildVisibleLeads(pool) {
     if (!grouped.has(record.county)) grouped.set(record.county, []);
     grouped.get(record.county).push(record);
   });
+
   const visible = [];
   grouped.forEach(records => {
-    const selected = records.find(r => r.status === 'pending') || records.find(r => r.status === 'won') || records.find(r => r.status === 'competitor');
+    const selected =
+      records.find(r => r.status === "pending") ||
+      records.find(r => r.status === "won") ||
+      records.find(r => r.status === "competitor");
     if (selected) visible.push(selected);
   });
+
   return visible.sort((a, b) => a.county.localeCompare(b.county));
 }
 function refreshVisibleForKey(key) {
@@ -554,7 +559,7 @@ function refreshVisibleForKey(key) {
 async function searchAgents() {
   const stateInput = document.getElementById('countyInput');
   const industryId = document.getElementById('categorySelect').value;
-  const limit = Math.min(500, Math.max(25, parseInt(document.getElementById('limitInput').value, 10) || 250));
+  const limit = Math.min(500, Math.max(50, parseInt(document.getElementById("limitInput").value, 10) || 500));
   document.getElementById('limitInput').value = limit;
   const validation = await validateStateName(stateInput.value);
   if (!validation.ok) {
@@ -572,6 +577,8 @@ async function searchAgents() {
   document.getElementById('agentsList').innerHTML = '';
   document.getElementById('searchBtn').disabled = true;
   let pool = [];
+
+  
   if (apiKey) {
     try {
       const q = `${ind.query} in ${state}`;
